@@ -52,7 +52,7 @@ def round_down(n, decimals=2):
     print(str(math.floor(float(n.replace('.','DOT').replace('DOT','').replace(',','.')) * multiplier) / multiplier).replace('.', ','))
     return str(math.floor(float(n.replace('.','DOT').replace('DOT','').replace(',','.')) * multiplier) / multiplier).replace('.', ',')
 
-# Check deviation.
+# Check billed power deviation.
 def check_deviation_billed_power(lectura_real_maximetro, potencia_contratada, potencia_facturada_peaje_acceso, potencia_facturada_margen_comercializadora):
     print(lectura_real_maximetro)
     if lectura_real_maximetro != 0 and (lectura_real_maximetro < 0.85 * potencia_contratada):
@@ -65,6 +65,27 @@ def check_deviation_billed_power(lectura_real_maximetro, potencia_contratada, po
         if ((lectura_real_maximetro - potencia_facturada_peaje_acceso > 0.01) or (lectura_real_maximetro - potencia_facturada_peaje_acceso > 0.01)):
            print("power billed incorrectly")
 
+# Check total invoice cost deviation.
+def check_deviation_total_cost(total= "0",  energia_consumida_periodo_aux = "0", precio_energia_peaje_acceso_aux = "0", precio_energia_coste_aux = "0", potencia_facturada_peaje_acceso_aux ="0", precio_potencia_peaje_acceso_aux="0", dias_periodo_potencia_peaje_acceso_aux="0", dias_año_potencia_peaje_acceso_aux="0", precio_potencia_margen_comercializadora_aux="0", dias_periodo_margen_comercializadora_aux="0", dias_año_margen_comercializadora_aux="0", energia_consumida_periodo_punta_aux="0", precio_energia_peaje_acceso_punta_aux="0", precio_energia_punta_coste_aux="0", energia_consumida_periodo_valle_aux="0", precio_energia_peaje_acceso_valle_aux="0", precio_energia_valle_coste_aux="0", base_impuesto_electrico_aux="0", porcentaje_impuesto_electrico_aux="0", dias_alquiler_equipos_medida_control_aux="0", precio_alquiler_contador_aux="0", suplemento_territorial_aux="0", importe_iva_aux="0"):
+
+    importe_total_estimado = float(potencia_facturada_peaje_acceso_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_potencia_peaje_acceso_aux.replace('.','DOT').replace('DOT','').replace(',','.')) * float(dias_periodo_potencia_peaje_acceso_aux)/float(dias_año_potencia_peaje_acceso_aux) + float(potencia_facturada_peaje_acceso_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_potencia_margen_comercializadora_aux.replace('.','DOT').replace('DOT','').replace(',','.')) * float(dias_periodo_margen_comercializadora_aux)/float(dias_año_margen_comercializadora_aux) + float(energia_consumida_periodo_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_energia_peaje_acceso_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) + float(energia_consumida_periodo_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_energia_coste_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) + float(energia_consumida_periodo_punta_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_energia_peaje_acceso_punta_aux.replace('.','DOT').replace('DOT','').replace(',','.')) + float(energia_consumida_periodo_punta_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_energia_punta_coste_aux.replace('.','DOT').replace('DOT','').replace(',','.')) + float(energia_consumida_periodo_valle_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_energia_peaje_acceso_valle_aux.replace('.','DOT').replace('DOT','').replace(',','.')) + float(energia_consumida_periodo_valle_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_energia_valle_coste_aux.replace('.','DOT').replace('DOT','').replace(',','.')) + float(base_impuesto_electrico_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(porcentaje_impuesto_electrico_aux.replace('.','DOT').replace('DOT','').replace(',','.')) * 0.01 + float(dias_alquiler_equipos_medida_control_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_alquiler_contador_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) + float(suplemento_territorial_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) + float(importe_iva_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.'))
+
+    if abs(float(total.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) - (importe_total_estimado)) > 0.02:
+        print("Total import is not consistent ")
+        print(str(float(potencia_facturada_peaje_acceso_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_potencia_peaje_acceso_aux.replace('.','DOT').replace('DOT','').replace(',','.')) * float(dias_periodo_potencia_peaje_acceso_aux)/float(dias_año_potencia_peaje_acceso_aux)))
+        print(float(potencia_facturada_peaje_acceso_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_potencia_margen_comercializadora_aux.replace('.','DOT').replace('DOT','').replace(',','.'))  * float(dias_periodo_margen_comercializadora_aux) / float(dias_año_margen_comercializadora_aux))
+        print(float(energia_consumida_periodo_punta_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_energia_peaje_acceso_punta_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')))
+        print(float(energia_consumida_periodo_punta_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_energia_punta_coste_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')))
+        print(float(energia_consumida_periodo_valle_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_energia_peaje_acceso_valle_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')))
+        print(float(energia_consumida_periodo_valle_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_energia_valle_coste_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')))
+        print(float(base_impuesto_electrico_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(porcentaje_impuesto_electrico_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * 0.01)
+        print(float(dias_alquiler_equipos_medida_control_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')) * float(precio_alquiler_contador_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')))
+        print(float(suplemento_territorial_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')))
+        print(float(importe_iva_aux.replace('.', 'DOT').replace('DOT', '').replace(',', '.')))
+        print(total + ";" + potencia_facturada_peaje_acceso_aux + ";" + precio_potencia_peaje_acceso_aux + ";" + dias_periodo_potencia_peaje_acceso_aux + ";" + dias_año_potencia_peaje_acceso_aux + ";" + precio_potencia_margen_comercializadora_aux + ";" + dias_periodo_margen_comercializadora_aux + ";" + dias_año_margen_comercializadora_aux + ";" + energia_consumida_periodo_punta_aux + ";" + precio_energia_peaje_acceso_punta_aux + ";" + precio_energia_punta_coste_aux + ";" + energia_consumida_periodo_valle_aux + ";" + precio_energia_peaje_acceso_valle_aux + ";" + precio_energia_valle_coste_aux + ";" + base_impuesto_electrico_aux + ";" + porcentaje_impuesto_electrico_aux + ";" + dias_alquiler_equipos_medida_control_aux + ";" + precio_alquiler_contador_aux + ";" + suplemento_territorial_aux + ";" + importe_iva_aux)
+
+    return importe_total_estimado
+
 def check_deviation_product(total, w = "1", x = "1", dias_periodo = 1, dias_año = 1):
 
     if abs(float(total.replace('.','DOT').replace('DOT','').replace(',','.')) - (float(w.replace('.','DOT').replace('DOT','').replace(',','.')) * float(x.replace('.','DOT').replace('DOT','').replace(',','.')) * float(str(dias_periodo).replace('.','DOT').replace('DOT','').replace(',','.')) * 1/float(str(dias_año).replace('.','DOT').replace('DOT','').replace(',','.')))) > 0.02:
@@ -72,10 +93,10 @@ def check_deviation_product(total, w = "1", x = "1", dias_periodo = 1, dias_año
          print("Total cost: " + total + " is not consistent -----> " + w + " * " + x + " * " + str(dias_periodo) + " * 1/" + str(dias_año))
 
 
-def check_deviation_sum(total, t = "0", u = "0", v = "0", w = "0", x = "0", y = "0", z = "0"):
+def check_deviation(total, t = "0", u = "0", v = "0", w = "0", x = "0", y = "0", z = "0"):
 
     if abs(float(total.replace('.','DOT').replace('DOT','').replace(',','.')) - (float(t.replace('.','DOT').replace('DOT','').replace(',','.')) + float(u.replace('.','DOT').replace('DOT','').replace(',','.')) + float(v.replace('.','DOT').replace('DOT','').replace(',','.')) + float(w.replace('.','DOT').replace('DOT','').replace(',','.')) + float(x.replace('.','DOT').replace('DOT','').replace(',','.')) + float(y.replace('.','DOT').replace('DOT','').replace(',','.')) + float(z.replace('.','DOT').replace('DOT','').replace(',','.')))) > 0.02:
-         print("Total cost: " + total + " is not consistent -----> " + t + " + " + u + " + " + v + " + " + w + " + " + x + " + " + y + " + " + z)
+         print("Total cost: " + total + " is not consistent -----> " + t + " -( " + u + " + " + v + " + " + w + " + " + x + " + " + y + " + " + z + " )")
 
 #-------------------SELECT DIRECTORY AND CONVERSION TO .TXT
 Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
@@ -193,6 +214,7 @@ for i in range(len(files2process)):
     tipo_contrato = ParseFields('TIPO DE CONTRATO: *(.+?) *TIPO', field_name = "tipo_contrato")
     tipo_contador = ParseFields('TIPO DE CONTADOR: *(.+?) *Nº', field_name = "tipo_contador")
     numero_referencia = ParseFields('Nº referencia: *(.+?) *Oficina', field_name = "numero_referencia")
+    oficina_contable = ParseFields('Oficina Contable: *(.+?) *Unidad', field_name="oficina_contable")
     potencia_contratada = ParseFields('Potencia contratada: *(.+?) *kW Referencia', field_name = "potencia_contratada")
     referencia_contrato_suministro = ParseFields('Referencia del contrato de suministro \(Comercializadora Regulada, Gas & Power, S.A.\): *(.+?) *Referencia', field_name = "referencia_contrato_suministro")
     referencia_contrato_acceso = ParseFields('Referencia del contrato de acceso \(UFD Distribución Electricidad, S.A.\): *(.+?) *Fecha', field_name = "referencia_contrato_acceso")
@@ -221,16 +243,28 @@ for i in range(len(files2process)):
         importe_peaje_acceso_valle = ParseFields('_+ *(\d{0,3},\d{0,3}?) *€ Importe por coste de la energía valle', field_name = "importe_peaje_acceso_valle")
         precio_energia_valle_coste = ParseFields('Importe por coste de la energía valle: *', re.escape(energia_consumida_periodo_valle), ' *kWh *\(real\) *\* *(.+?) *€', field_name = "precio_energia_valle_coste")
         importe_energia_valle_coste = ParseFields('Importe por coste de la energía valle: *', re.escape(energia_consumida_periodo_valle), ' *kWh *\(real\) *\* *', re.escape(precio_energia_valle_coste), ' *€/kWh *', '_+ *(\d{0,3},\d{0,3}?) *€', field_name = "importe_energia_valle_coste")
+        energia_consumida_periodo = "0"
+        precio_energia_peaje_acceso = "0"
+        importe_peaje_acceso = "0"
+        precio_energia_coste = "0"
+        importe_energia_coste = "0"
+
     else:
         energia_consumida_periodo = ParseFields('del PVPC\). Importe por peaje de acceso: *(.+?) *kWh \(real\)', field_name = "energia_consumida_periodo")
         precio_energia_peaje_acceso = ParseFields('del PVPC\). Importe por peaje de acceso: *', re.escape(energia_consumida_periodo), ' *kWh \(real\) \* (.+?) *€', field_name = "precio_energia_peaje_acceso")
         importe_peaje_acceso = ParseFields('_+ *(\d{0,3},\d{0,3}?) *€ Importe por coste de la energía', field_name = "importe_peaje_acceso")
         precio_energia_coste = ParseFields('Importe por coste de la energía: *', re.escape(energia_consumida_periodo), ' *kWh[^\S\n\t]\(real\) *\* *(.+?) *€', field_name = "precio_energia_coste")
         importe_energia_coste = ParseFields('Importe por coste de la energía: *', re.escape(energia_consumida_periodo), ' *kWh[^\S\n\t]\(real\) *\* *', re.escape(precio_energia_coste), ' *€/kWh *_+ *(\d{0,3},\d{0,3}?) *€', field_name = "importe_energia_coste")
+        energia_consumida_periodo_punta = "0"
+        precio_energia_peaje_acceso_punta = "0"
+        precio_energia_punta_coste = "0"
+        energia_consumida_periodo_valle = "0"
+        precio_energia_peaje_acceso_valle = "0"
+        precio_energia_valle_coste = "0"
+
 
     suplemento_territorial = ParseFields('según la orden TEC/271/2019 \(\*\) *_+', ' *(\d{0,3},\d{0,3}?) *€ Subtotal', field_name = "suplemento_territorial")
-
-    if not suplemento_territorial:
+    if suplemento_territorial is None:
         suplemento_territorial = "0"
 
     base_impuesto_electrico = ParseFields('Impuesto Eléctrico *\((.+?) *\*', field_name = "base_impuesto_electrico")
@@ -243,24 +277,27 @@ for i in range(len(files2process)):
     importe_iva = ParseFields('_+ *(\d{0,3},\d{0,3}?) *€ *TOTAL *IMPORTE', field_name = "importe_iva")
 
     # CHECKS AND ALERTS
+    importe_total_estimado = check_deviation_total_cost(total = total_importe_factura, energia_consumida_periodo_aux = energia_consumida_periodo, precio_energia_peaje_acceso_aux = precio_energia_peaje_acceso, precio_energia_coste_aux = precio_energia_coste, potencia_facturada_peaje_acceso_aux = potencia_facturada_peaje_acceso, precio_potencia_peaje_acceso_aux = precio_potencia_peaje_acceso, dias_periodo_potencia_peaje_acceso_aux=dias_periodo_potencia_peaje_acceso, dias_año_potencia_peaje_acceso_aux=dias_año_potencia_peaje_acceso, precio_potencia_margen_comercializadora_aux=precio_potencia_margen_comercializadora, dias_periodo_margen_comercializadora_aux=dias_periodo_margen_comercializadora, dias_año_margen_comercializadora_aux=dias_año_margen_comercializadora, energia_consumida_periodo_punta_aux=energia_consumida_periodo_punta, precio_energia_peaje_acceso_punta_aux=precio_energia_peaje_acceso_punta, precio_energia_punta_coste_aux=precio_energia_punta_coste, energia_consumida_periodo_valle_aux=energia_consumida_periodo_valle, precio_energia_peaje_acceso_valle_aux=precio_energia_peaje_acceso_valle, precio_energia_valle_coste_aux=precio_energia_valle_coste, base_impuesto_electrico_aux=base_impuesto_electrico, porcentaje_impuesto_electrico_aux=porcentaje_impuesto_electrico, dias_alquiler_equipos_medida_control_aux=dias_alquiler_equipos_medida_control, precio_alquiler_contador_aux=precio_alquiler_contador, suplemento_territorial_aux=suplemento_territorial, importe_iva_aux=importe_iva)
+    print(importe_total_estimado)
+    print(total_importe_factura)
     check_deviation_product(total = importe_potencia_peaje_acceso , w = potencia_facturada_peaje_acceso, x = precio_potencia_peaje_acceso, dias_periodo = dias_periodo_potencia_peaje_acceso, dias_año = dias_año_potencia_peaje_acceso)
     check_deviation_product(total = importe_margen_comercializadora_fijo , w = potencia_facturada_margen_comercializadora, x = precio_potencia_margen_comercializadora, dias_periodo = dias_periodo_margen_comercializadora, dias_año = dias_año_margen_comercializadora)
-    check_deviation_sum(total = total_importe_factura, t = lectura_actual_periodo_punta, u = "-" + lectura_anterior_periodo_punta)
+    check_deviation(total = energia_consumida_periodo_punta, t = lectura_actual_periodo_punta, u = "-" + lectura_anterior_periodo_punta)
 
     if peaje_acceso == '2.0DHA':
         check_deviation_product(total = importe_energia_punta_coste , w = energia_consumida_periodo_punta, x = precio_energia_punta_coste)
         check_deviation_product(total = importe_peaje_acceso_valle , w = energia_consumida_periodo_valle, x = precio_energia_peaje_acceso_valle)
         check_deviation_product(total = importe_energia_valle_coste , w = energia_consumida_periodo_valle, x = precio_energia_valle_coste)
-        check_deviation_sum(total = base_impuesto_electrico, t = importe_potencia_peaje_acceso, u = importe_margen_comercializadora_fijo, v = importe_peaje_acceso_punta, w = importe_energia_punta_coste, x = importe_peaje_acceso_valle, y = importe_energia_valle_coste, z = suplemento_territorial)
+        check_deviation(total = base_impuesto_electrico, t = importe_potencia_peaje_acceso, u = importe_margen_comercializadora_fijo, v = importe_peaje_acceso_punta, w = importe_energia_punta_coste, x = importe_peaje_acceso_valle, y = importe_energia_valle_coste, z = suplemento_territorial)
 
     else:
         check_deviation_product(total = importe_peaje_acceso , w = energia_consumida_periodo, x = precio_energia_peaje_acceso)
         check_deviation_product(total = importe_energia_coste , w = energia_consumida_periodo, x = precio_energia_coste)
-        check_deviation_sum(total = base_impuesto_electrico, t = importe_potencia_peaje_acceso, u = importe_margen_comercializadora_fijo, v = importe_peaje_acceso, w = importe_energia_coste, x = suplemento_territorial)
+        check_deviation(total = base_impuesto_electrico, t = importe_potencia_peaje_acceso, u = importe_margen_comercializadora_fijo, v = importe_peaje_acceso, w = importe_energia_coste, x = suplemento_territorial)
 
     check_deviation_product(total = importe_impuesto_electrico , w = base_impuesto_electrico, x = porcentaje_impuesto_electrico, dias_periodo = "0,01")
     check_deviation_product(total = importe_alquiler_contador , w = dias_alquiler_equipos_medida_control, x = precio_alquiler_contador)
-    check_deviation_sum(total = total_importe_factura, t = base_impuesto_electrico, u = importe_impuesto_electrico, v = importe_alquiler_contador, w = importe_iva)
+    check_deviation(total = total_importe_factura, t = base_impuesto_electrico, u = importe_impuesto_electrico, v = importe_alquiler_contador, w = importe_iva)
 
     check_deviation_billed_power(float(lectura_real_maximetro.replace('.','DOT').replace('DOT','').replace(',','.')), float(potencia_contratada.replace('.','DOT').replace('DOT','').replace(',','.')), float(potencia_facturada_peaje_acceso.replace('.','DOT').replace('DOT','').replace(',','.')), float(potencia_facturada_margen_comercializadora.replace('.','DOT').replace('DOT','').replace(',','.')))
     # ROUND PRICES
@@ -273,6 +310,7 @@ for i in range(len(files2process)):
     fecha_desde_periodo_consumo_2db = str(fecha_desde_periodo_consumo)
     fecha_hasta_periodo_consumo_2db = str(fecha_hasta_periodo_consumo)
     fecha_cargo_2db = str(fecha_cargo)
+    oficina_contable_2db = str(oficina_contable)
     total_importe_factura_2db = str(total_importe_factura)
     numero_contador_2db = str(numero_contador)
     fecha_lectura_anterior_2db = str(fecha_lectura_anterior)
@@ -344,39 +382,80 @@ for i in range(len(files2process)):
     importe_alquiler_contador_2db = str(round_down(importe_alquiler_contador))
     importe_iva_2db = str(round_down(importe_iva))
     precio_alquiler_contador_2db = str(round_down(precio_alquiler_contador))
+    importe_total_estimado_2db = str(importe_total_estimado)
+    desviacion_total_importe_2db = str(importe_total_estimado - float(total_importe_factura.replace('.','DOT').replace('DOT','').replace(',','.')))
 
     mycursor = mydb.cursor()
 
-    sql = "INSERT INTO m_i_ayuntamientos (titular, nif, direccion_suministro) VALUES (%s, %s, %s)"
-    print(sql)
-    val = [titular_2db, nif_2db, direccion_suministro_2db]
-    print(val)
-    mycursor.execute(sql, val)
+    mycursor.execute(
+        "SELECT nif, COUNT(*) FROM m_i_ayuntamientos WHERE nif = %s GROUP BY nif",
+        (nif_2db,)
+    )
+    # Add THIS LINE
+    results = mycursor.fetchall()
+    # gets the number of rows affected by the command executed
+    row_count = mycursor.rowcount
+    print("number of affected rows: {}".format(row_count))
 
-    mydb.commit()
+    if row_count == 0:
+        print("It Does Not Exist")
 
-    print(mycursor.rowcount, "record inserted.")
+        sql = "INSERT INTO m_i_ayuntamientos (titular, nif, oficina_contable) VALUES (%s, %s, %s)"
+        print(sql)
+        val = [titular_2db, nif_2db, oficina_contable_2db]
+        print(val)
+        mycursor.execute(sql, val)
+
+        mydb.commit()
+
+        print(mycursor.rowcount, "record inserted.")
 
     mycursor = mydb.cursor()
 
-    sql = "INSERT INTO m_i_suministros (cups, peaje_acceso, numero_contador, tipo_contador, potencia_contratada, tipo_contrato, fecha_final_contrato, numero_referencia, referencia_contrato_suministro, referencia_contrato_acceso) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    print(sql)
-    val = [cups_2db, peaje_acceso_2db, numero_contador_2db, tipo_contador_2db, potencia_contratada_2db, tipo_contrato_2db, fecha_final_contrato_2db, numero_referencia_2db, referencia_contrato_suministro_2db, referencia_contrato_acceso_2db]
-    print(val)
-    mycursor.execute(sql, val)
+    mycursor.execute(
+        "SELECT cups, COUNT(*) FROM m_i_suministros WHERE cups = %s GROUP BY cups",
+        (cups_2db,)
+    )
+    # Add THIS LINE
+    results = mycursor.fetchall()
+    # gets the number of rows affected by the command executed
+    row_count = mycursor.rowcount
+    print("number of affected rows: {}".format(row_count))
 
-    mydb.commit()
+    if row_count == 0:
+        print("It Does Not Exist")
 
-    print(mycursor.rowcount, "record inserted.")
+        sql = "INSERT INTO m_i_suministros (cups, peaje_acceso, numero_contador, tipo_contador, potencia_contratada, tipo_contrato, fecha_final_contrato, numero_referencia, referencia_contrato_suministro, referencia_contrato_acceso, direccion_suministro) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        print(sql)
+        val = [cups_2db, peaje_acceso_2db, numero_contador_2db, tipo_contador_2db, potencia_contratada_2db, tipo_contrato_2db, fecha_final_contrato_2db, numero_referencia_2db, referencia_contrato_suministro_2db, referencia_contrato_acceso_2db, direccion_suministro_2db]
+        print(val)
+        mycursor.execute(sql, val)
 
-    mycursor = mydb.cursor()
+        mydb.commit()
 
-    sql = "INSERT INTO p_i_facturas (numero_factura, cups, peaje_acceso, numero_contador, titular, fecha_emision_factura, fecha_desde_periodo_consumo, fecha_hasta_periodo_consumo, fecha_cargo, total_importe_factura, fecha_lectura_anterior, lectura_anterior_periodo_punta, lectura_anterior_periodo_valle, fecha_lectura_actual, lectura_actual_periodo_punta, lectura_actual_periodo_valle, consumo_periodo_punta, consumo_periodo_valle, fecha_lectura_maximetro, lectura_real_maximetro, potencia_contratada, potencia_facturada_peaje_acceso, precio_potencia_peaje_acceso, dias_periodo_potencia_peaje_acceso, dias_año_potencia_peaje_acceso, importe_potencia_peaje_acceso, potencia_facturada_margen_comercializadora, precio_potencia_margen_comercializadora, dias_periodo_margen_comercializadora, dias_año_margen_comercializadora, importe_margen_comercializadora_fijo, energia_consumida_periodo_punta, precio_energia_peaje_acceso_punta, importe_peaje_acceso_punta, precio_energia_punta_coste, importe_energia_punta_coste, energia_consumida_periodo_valle, precio_energia_peaje_acceso_valle, importe_peaje_acceso_valle, precio_energia_valle_coste, importe_energia_valle_coste, suplemento_territorial, base_impuesto_electrico, porcentaje_impuesto_electrico, importe_impuesto_electrico, dias_alquiler_equipos_medida_control, precio_alquiler_contador, importe_alquiler_contador, porcentaje_iva, importe_iva) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    print(sql)
-    val = [numero_factura_2db, cups_2db, peaje_acceso_2db, numero_contador_2db, titular_2db, fecha_emision_factura_2db, fecha_desde_periodo_consumo_2db, fecha_hasta_periodo_consumo_2db, fecha_cargo_2db, total_importe_factura_2db, fecha_lectura_anterior_2db, lectura_anterior_periodo_punta_2db, lectura_anterior_periodo_valle_2db, fecha_lectura_actual_2db, lectura_actual_periodo_punta_2db, lectura_actual_periodo_valle_2db, consumo_periodo_punta_2db, consumo_periodo_valle_2db, fecha_lectura_maximetro_2db, lectura_real_maximetro_2db, potencia_contratada_2db, potencia_facturada_peaje_acceso_2db, precio_potencia_peaje_acceso_2db, dias_periodo_potencia_peaje_acceso_2db, dias_año_potencia_peaje_acceso_2db, importe_potencia_peaje_acceso_2db, potencia_facturada_margen_comercializadora_2db, precio_potencia_margen_comercializadora_2db, dias_periodo_margen_comercializadora_2db, dias_año_margen_comercializadora_2db, importe_margen_comercializadora_fijo_2db, energia_consumida_periodo_punta_2db, precio_energia_peaje_acceso_punta_2db, importe_peaje_acceso_punta_2db, precio_energia_punta_coste_2db, importe_energia_punta_coste_2db, energia_consumida_periodo_valle_2db, precio_energia_peaje_acceso_valle_2db, importe_peaje_acceso_valle_2db, precio_energia_valle_coste_2db, importe_energia_valle_coste_2db, suplemento_territorial_2db, base_impuesto_electrico_2db, porcentaje_impuesto_electrico_2db, importe_impuesto_electrico_2db, dias_alquiler_equipos_medida_control_2db, precio_alquiler_contador_2db, importe_alquiler_contador_2db, porcentaje_iva_2db, importe_iva_2db]
-    print(val)
-    mycursor.execute(sql, val)
+        print(mycursor.rowcount, "record inserted.")
 
-    mydb.commit()
+    mycursor.execute(
+        "SELECT numero_factura, COUNT(*) FROM p_i_facturas WHERE numero_factura = %s GROUP BY numero_factura",
+        (numero_factura_2db,)
+    )
+    # Add THIS LINE
+    results = mycursor.fetchall()
+    # gets the number of rows affected by the command executed
+    row_count = mycursor.rowcount
+    print("number of affected rows: {}".format(row_count))
 
-    print(mycursor.rowcount, "record inserted.")
+    if row_count == 0:
+        print("It Does Not Exist")
+
+        mycursor = mydb.cursor()
+
+        sql = "INSERT INTO p_i_facturas (numero_factura, cups, peaje_acceso, numero_contador, titular, fecha_emision_factura, fecha_desde_periodo_consumo, fecha_hasta_periodo_consumo, fecha_cargo, total_importe_factura, fecha_lectura_anterior, lectura_anterior_periodo_punta, lectura_anterior_periodo_valle, fecha_lectura_actual, lectura_actual_periodo_punta, lectura_actual_periodo_valle, consumo_periodo_punta, consumo_periodo_valle, fecha_lectura_maximetro, lectura_real_maximetro, potencia_contratada, potencia_facturada_peaje_acceso, precio_potencia_peaje_acceso, dias_periodo_potencia_peaje_acceso, dias_año_potencia_peaje_acceso, importe_potencia_peaje_acceso, potencia_facturada_margen_comercializadora, precio_potencia_margen_comercializadora, dias_periodo_margen_comercializadora, dias_año_margen_comercializadora, importe_margen_comercializadora_fijo, energia_consumida_periodo_punta, precio_energia_peaje_acceso_punta, importe_peaje_acceso_punta, precio_energia_punta_coste, importe_energia_punta_coste, energia_consumida_periodo_valle, precio_energia_peaje_acceso_valle, importe_peaje_acceso_valle, precio_energia_valle_coste, importe_energia_valle_coste, suplemento_territorial, base_impuesto_electrico, porcentaje_impuesto_electrico, importe_impuesto_electrico, dias_alquiler_equipos_medida_control, precio_alquiler_contador, importe_alquiler_contador, porcentaje_iva, importe_iva, nif, importe_total_estimado, desviacion_total_importe) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        print(sql)
+        val = [numero_factura_2db, cups_2db, peaje_acceso_2db, numero_contador_2db, titular_2db, fecha_emision_factura_2db, fecha_desde_periodo_consumo_2db, fecha_hasta_periodo_consumo_2db, fecha_cargo_2db, total_importe_factura_2db, fecha_lectura_anterior_2db, lectura_anterior_periodo_punta_2db, lectura_anterior_periodo_valle_2db, fecha_lectura_actual_2db, lectura_actual_periodo_punta_2db, lectura_actual_periodo_valle_2db, consumo_periodo_punta_2db, consumo_periodo_valle_2db, fecha_lectura_maximetro_2db, lectura_real_maximetro_2db, potencia_contratada_2db, potencia_facturada_peaje_acceso_2db, precio_potencia_peaje_acceso_2db, dias_periodo_potencia_peaje_acceso_2db, dias_año_potencia_peaje_acceso_2db, importe_potencia_peaje_acceso_2db, potencia_facturada_margen_comercializadora_2db, precio_potencia_margen_comercializadora_2db, dias_periodo_margen_comercializadora_2db, dias_año_margen_comercializadora_2db, importe_margen_comercializadora_fijo_2db, energia_consumida_periodo_punta_2db, precio_energia_peaje_acceso_punta_2db, importe_peaje_acceso_punta_2db, precio_energia_punta_coste_2db, importe_energia_punta_coste_2db, energia_consumida_periodo_valle_2db, precio_energia_peaje_acceso_valle_2db, importe_peaje_acceso_valle_2db, precio_energia_valle_coste_2db, importe_energia_valle_coste_2db, suplemento_territorial_2db, base_impuesto_electrico_2db, porcentaje_impuesto_electrico_2db, importe_impuesto_electrico_2db, dias_alquiler_equipos_medida_control_2db, precio_alquiler_contador_2db, importe_alquiler_contador_2db, porcentaje_iva_2db, importe_iva_2db, nif_2db, importe_total_estimado_2db, desviacion_total_importe_2db]
+        print(val)
+        mycursor.execute(sql, val)
+
+        mydb.commit()
+
+        print(mycursor.rowcount, "record inserted.")
