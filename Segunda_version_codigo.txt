@@ -1,0 +1,295 @@
+A
+import re
+import pyodbc
+import PyPDF2
+from tika import parser
+
+def convert_pdf_to_txt(path):
+    rsrcmgr = PDFResourceManager()
+    retstr = StringIO()
+    codec = 'utf-8'
+    laparams = LAParams()
+    device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
+    fp = open(path, 'rb')
+    interpreter = PDFPageInterpreter(rsrcmgr, device)
+    password = ""
+    maxpages = 0
+    caching = True
+    pagenos=set()
+
+    for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password,caching=caching, check_extractable=False):
+        interpreter.process_page(page)
+
+    text = retstr.getvalue()
+
+    fp.close()
+    device.close()
+    retstr.close()
+    return text
+
+# Python program to convert a list to string
+
+# Function to convert ''.join(mylist)
+def listToString(s):
+
+    # initialize an empty string
+    str1 = " "
+
+    # return string
+    return (str1.join(s))
+
+text = convert_pdf_to_txt("Factura_Num_FE16137007966831_fact_20DHA.pdf").strip().split('\n\n')
+text = listToString(text)
+text = text.replace('\n', ' ')
+text = text.replace('\n', ' ')
+
+# Function to search
+def ExtractFields(x, y = '', z = '', occurrence = 1):
+
+    # initialize regex search
+    Aux_search = x + y + z
+    try:
+        Factura_search = re.search(Aux_search, text)
+
+        if Factura_search:
+            print(Factura_search.group(1))
+            return(Factura_search.group(1))
+
+    except AttributeError:
+        return ("Error")
+
+# Function to extract text
+def getPDFFileContentToTXT(pdfFile):
+    myPDFFile = PyPDF2.PdfFileReader(pdfFile)
+
+    with open('./pdfContent.txt', 'w', encoding="utf-8") as pdf_output:
+        for page in range(myPDFFile.getNumPages()):
+            data = myPDFFile.getPage(page).extractText()
+            pdf_output.write(data)
+
+    with open('./pdfContent.txt', 'r', encoding="utf-8") as myPDFContent:
+        return myPDFContent.read().replace('\n', '')
+
+
+#------------------- DATABASE CONNECTION
+import mysql.connector
+
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  passwd="MySQLFE16137007966831",
+  database="Renowattio"
+)
+
+#Inicializar campos
+Número_Factura = "FE123123"; Fecha_desde_periodo_consumo = 12; Fecha_hasta_periodo_consumo = 12; Fecha_cargo = 12
+Dirección_facturacion = "OURENSE"; A_la_atención_de = "AYTO"; TOTAL_IMPORTE_FACTURA = 100; Fecha_lectura_anterior = "-sep-16"; Fecha_lectura_actual= "oct-16"
+Lectura_anterior_periodo_punta = 66,953; Lectura_actual_periodo_punta = 66,953; Consumo_periodo_punta = 0; Lectura_anterior_periodo_valle = 125,904
+Lectura_actual_periodo_valle = 125,904; Consumo_periodo_valle = 0; Contador_nº= 46015829; Lectura_real_maximetro = 16,75
+Fecha_lectura_maximetro	= "4 de octubre de 2016"; NIF = "A"; Direccion_de_suministro = "a"; TIPO_DE_CONTRATO = "a"; TIPO_DE_CONTADOR = "a"
+Numero_de_cuenta_cliente = 1; Peaje_de_acceso = "a"; Potencia_contratada = 9; Fecha_final_contrato = "A"; Fecha_emision_factura = "A"; CUPS = "A"
+Numeros_factura = re.findall(r"[+-]? *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", text)
+#print(Numeros_factura)
+# [i for i,x in enumerate(Numeros_factura) if x == 1]
+
+
+Número_Factura = ExtractFields('Factura:[^\S\n\t]+(.+?)[^\S\n\t]+')
+TOTAL_IMPORTE_FACTURA = ExtractFields(re.escape(Número_Factura), '[^\S\n\t]+(.+?)[^\S\n\t]')
+Fecha_desde_periodo_consumo = ExtractFields('Periodo de consumo[^\S\n\t]+(.+?)[^\S\n\t]+a[^\S\n\t]')
+Fecha_hasta_periodo_consumo = ExtractFields(re.escape(Fecha_desde_periodo_consumo),'[^\S\n\t]+a[^\S\n\t]+(.+?)[^\S\n\t]+Fecha')
+Fecha_cargo = ExtractFields('fecha límite de pago[^\S\n\t]+(.+?)[^\S\n\t]+AYTO')
+Dirección_facturación = ExtractFields(re.escape(Fecha_cargo),'[^\S\n\t]+(.+?)[^\S\n\t]+Departamento')
+A_la_atención_de = ExtractFields('de:[^\S\n\t]+(.+?)[^\S\n\t]+Gas')
+Fecha_lectura_anterior = ExtractFields('anterior real[^\S\n\t]+(.+?)[^\S\n\t]+Lectura actual real')
+Fecha_lectura_actual= ExtractFields('Lectura actual real[^\S\n\t]+(.+?)[^\S\n\t]+Consumo en el período')
+Fecha_lectura_maximetro	= ExtractFields('maxímetro[^\S\n\t]+(.+?)[^\S\n\t]')
+Lectura_anterior_periodo_punta = ExtractFields('Lectura real maxímetro ', re.escape(Fecha_lectura_maximetro),'[^\S\n\t]+(.+?)[^\S\n\t]+kWh')
+Lectura_anterior_periodo_valle = [i for i, item in enumerate(Numeros_factura) if re.search(Lectura_anterior_periodo_punta, item)]
+Index_lectura_anterior_periodo_valle = Lectura_anterior_periodo_valle[0]
+Lectura_anterior_periodo_valle = Numeros_factura[Index_lectura_anterior_periodo_valle + 1]
+print("Lectura_anterior_periodo_valle: " + Lectura_anterior_periodo_valle)
+Lectura_actual_periodo_punta = Numeros_factura[Index_lectura_anterior_periodo_valle + 2]
+print("Lectura_actual_periodo_punta : " + Lectura_actual_periodo_punta)
+Lectura_actual_periodo_valle = Numeros_factura[Index_lectura_anterior_periodo_valle + 3]
+print("Lectura_actual_periodo_valle : " + Lectura_actual_periodo_valle)
+Consumo_periodo_punta =  Numeros_factura[Index_lectura_anterior_periodo_valle + 4]
+print("Consumo_periodo_punta : " + Consumo_periodo_punta)
+Lectura_real_maximetro = Numeros_factura[Index_lectura_anterior_periodo_valle + 5] + "," + Numeros_factura[Index_lectura_anterior_periodo_valle + 6]
+print("Lectura_real_maximetro : " + Lectura_real_maximetro)
+Consumo_periodo_valle = Numeros_factura[Index_lectura_anterior_periodo_valle + 7]
+print("Consumo_periodo_valle : " + Consumo_periodo_valle)
+NIF = ExtractFields('NIF:[^\S\n\t]+(.+?)[^\S\n\t]+Para')
+Direccion_de_suministro = ExtractFields('suministro:[^\S\n\t](.+?)[^\S\n\t]TIPO')
+TIPO_DE_CONTRATO = ExtractFields('CONTRATO:[^\S\n\t](.+?)[^\S\n\t]TIPO')
+TIPO_DE_CONTADOR = ExtractFields('CONTADOR:[^\S\n\t](.+?)Número')
+Numero_de_cuenta_cliente = ExtractFields('cliente:[^\S\n\t](.+?)[^\S\n\t]Oficina')
+Peaje_de_acceso = ExtractFields('acceso:[^\S\n\t](.+?)[^\S\n\t]')
+Potencia_contratada = ExtractFields('contratada:[^\S\n\t](.+?)[^\S\n\t]kW')
+Fecha_final_contrato = ExtractFields('final contrato:[^\S\n\t](.+?)[^\S\n\t]Fecha')
+Fecha_emision_factura = ExtractFields('emisión factura:[^\S\n\t](.+?)[^\S\n\t]Código')
+CUPS = ExtractFields('CUPS:[^\S\n\t]+(.+?)[^\S\n\t]+Atención')
+
+
+#PRUEBAS
+
+# Import libraries
+
+from PIL import Image
+
+import pytesseract
+
+import sys
+
+from pdf2image import convert_from_path
+
+import os
+
+
+# Path of the pdf
+
+PDF_file = "Factura_Num_FE16137007966831_fact_20DHA.pdf"
+
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+'''
+Part #1 : Converting PDF to images
+'''
+
+
+# Store all the pages of the PDF in a variable
+
+pages = convert_from_path(PDF_file, 500)
+
+
+# Counter to store images of each page of PDF to image
+
+image_counter = 1
+
+
+# Iterate through all the pages stored above
+
+for page in pages:
+
+
+
+    # Declaring filename for each page of PDF as JPG
+
+    # For each page, filename will be:
+
+    # PDF page 1 -> page_1.jpg
+
+    # PDF page 2 -> page_2.jpg
+
+    # PDF page 3 -> page_3.jpg
+
+    # ....
+
+    # PDF page n -> page_n.jpg
+
+    filename = "page_"+str(image_counter)+".jpg"
+
+
+
+    # Save the image of the page in system
+
+    page.save(filename, 'JPEG')
+    img = Image.open(filename)
+    img = img.convert('L')
+    img.save(filename)
+
+
+    # Increment the counter to update filename
+
+    image_counter = image_counter + 1
+
+# Variable to get count of total number of pages
+
+filelimit = image_counter-1
+
+
+# Creating a text file to write the output
+
+outfile = "out_text.txt"
+
+
+# Open the file in append mode so that
+# All contents of all images are added to the same file
+
+f = open(outfile, "a")
+
+
+# Iterate from 1 to total number of pages
+
+for i in range(1, filelimit + 1):
+
+
+
+    # Set filename to recognize text from
+
+    # Again, these files will be:
+
+    # page_1.jpg
+
+    # page_2.jpg
+
+    # ....
+
+    # page_n.jpg
+
+    filename = "page_"+str(i)+".jpg"
+
+
+
+    # Recognize the text as string in image using pytesserct
+
+    text = str(((pytesseract.image_to_string(Image.open(filename)))))
+
+
+
+    # The recognized text is stored in variable text
+
+    # Any string processing may be applied on text
+
+    # Here, basic formatting has been done:
+
+    # In many PDFs, at line ending, if a word can't
+
+    # be written fully, a 'hyphen' is added.
+
+    # The rest of the word is written in the next line
+
+    # Eg: This is a sample text this word here GeeksF-
+
+    # orGeeks is half on first line, remaining on next.
+
+    # To remove this, we replace every '-\n' to ''.
+
+    text = text.replace('-\n', '')
+
+
+
+    # Finally, write the processed text to the file.
+
+    f.write(text)
+
+
+# Close the file after writing all the text.
+f.close()
+
+#Escritura en base de datos
+#mycursor = mydb.cursor()
+
+#sql = "INSERT INTO Facturas (Número_Factura, Fecha_desde_periodo_consumo, Fecha_hasta_periodo_consumo, Fecha_cargo, Dirección_facturacion, A_la_atención_de, Fecha_lectura_anterior, Fecha_lectura_actual, Lectura_anterior_periodo_punta, Lectura_actual_periodo_punta, Consumo_periodo_punta, Lectura_anterior_periodo_valle, Lectura_actual_periodo_valle, Consumo_periodo_valle, Contador_nº, Lectura_real_maximetro, Fecha_lectura_maximetro, NIF, Direccion_de_suministro, TIPO_DE_CONTRATO, TIPO_DE_CONTADOR, Numero_de_cuenta_cliente, Peaje_de_acceso, Potencia_contratada, Fecha_final_contrato, Fecha_emision_factura, CUPS) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+#val = [Número_Factura, Fecha_desde_periodo_consumo, Fecha_hasta_periodo_consumo, Fecha_cargo, Dirección_facturacion, A_la_atención_de, Fecha_lectura_anterior, Fecha_lectura_actual, Lectura_anterior_periodo_punta, Lectura_actual_periodo_punta, Consumo_periodo_punta, Lectura_anterior_periodo_valle, Lectura_actual_periodo_valle, Consumo_periodo_valle, Contador_nº, Lectura_real_maximetro, Fecha_lectura_maximetro, NIF, Direccion_de_suministro, TIPO_DE_CONTRATO, TIPO_DE_CONTADOR, Numero_de_cuenta_cliente, Peaje_de_acceso, Potencia_contratada, Fecha_final_contrato, Fecha_emision_factura, CUPS]
+#mycursor.execute(sql, val)
+
+#mydb.commit()
+
+#print(mycursor.rowcount, "record inserted.")
+
+getPDFFileContentToTXT('Factura_Num_FE16137007966831_fact_20DHA.pdf')
+
+
+rawText = parser.from_file('Factura_Num_FE16137007966831_fact_20DHA.pdf')
+
+rawList = rawText['content'].splitlines()
+print(rawList)
