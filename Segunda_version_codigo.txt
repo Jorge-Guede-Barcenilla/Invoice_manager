@@ -1,6 +1,4 @@
-B
-ASWAFD
-SDAS
+A
 import re
 import pyodbc
 import PyPDF2
